@@ -242,4 +242,6 @@ def result_detail(result_id):
     return jsonify(result.to_dict())
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Only enable debug mode if explicitly set in environment
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)

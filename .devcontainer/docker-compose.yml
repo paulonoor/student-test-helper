@@ -13,3 +13,4 @@ services:
     environment:
       - DATABASE_URL=sqlite:///test_helper.db
       - FLASK_ENV=development
+      - FLASK_DEBUG=true
