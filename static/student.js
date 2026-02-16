@@ -4,6 +4,16 @@ let currentTest = null;
 // API Base URL
 const API_BASE = '/api';
 
+// Constants
+const SCORE_PRECISION = 1;
+
+// Helper function to escape HTML and prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Load initial data
 document.addEventListener('DOMContentLoaded', () => {
     loadDisciplines();
@@ -18,7 +28,7 @@ async function loadDisciplines() {
         
         const select = document.getElementById('filterDiscipline');
         select.innerHTML = '<option value="">All Disciplines</option>' +
-            disciplines.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+            disciplines.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
             
     } catch (error) {
         console.error('Error loading disciplines:', error);
@@ -44,15 +54,22 @@ async function loadTests() {
             list.innerHTML = tests.map(t => `
                 <div class="list-item">
                     <div class="list-item-content">
-                        <h3>${t.title}</h3>
-                        <p>${t.description || 'No description'}</p>
-                        <p><strong>Discipline:</strong> ${t.discipline_name} | <strong>Questions:</strong> ${t.question_count}</p>
+                        <h3>${escapeHtml(t.title)}</h3>
+                        <p>${escapeHtml(t.description || 'No description')}</p>
+                        <p><strong>Discipline:</strong> ${escapeHtml(t.discipline_name)} | <strong>Questions:</strong> ${t.question_count}</p>
                     </div>
                     <div class="list-item-actions">
-                        <button onclick="startTest(${t.id})" class="btn btn-primary">Take Test</button>
+                        <button class="btn btn-primary take-test-btn" data-test-id="${t.id}">Take Test</button>
                     </div>
                 </div>
             `).join('');
+            
+            // Attach event listeners
+            document.querySelectorAll('.take-test-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    startTest(parseInt(this.dataset.testId));
+                });
+            });
         }
     } catch (error) {
         console.error('Error loading tests:', error);
@@ -92,12 +109,12 @@ async function startTest(testId) {
         container.innerHTML = currentTest.questions.map((q, index) => `
             <div class="question-card">
                 <h3>Question ${index + 1}</h3>
-                <p>${q.question_text}</p>
+                <p>${escapeHtml(q.question_text)}</p>
                 <div class="question-options">
                     ${q.options.map(o => `
                         <label class="option-label">
                             <input type="radio" name="question_${q.id}" value="${o.id}" required>
-                            <span>${o.option_text}</span>
+                            <span>${escapeHtml(o.option_text)}</span>
                         </label>
                     `).join('')}
                 </div>
@@ -164,7 +181,7 @@ async function submitTest(event) {
 // Display test results
 function displayResults(results) {
     // Display score
-    document.getElementById('scoreDisplay').textContent = `${results.score.toFixed(1)}%`;
+    document.getElementById('scoreDisplay').textContent = `${results.score.toFixed(SCORE_PRECISION)}%`;
     document.getElementById('correctCount').textContent = results.correct_answers;
     document.getElementById('totalCount').textContent = results.total_questions;
     
@@ -174,13 +191,13 @@ function displayResults(results) {
         const isCorrect = result.is_correct;
         return `
             <div class="result-item ${isCorrect ? 'correct' : 'incorrect'}">
-                <h4>Question ${index + 1}: ${result.question_text}</h4>
-                <p><strong>Your answer:</strong> <span class="${isCorrect ? 'correct-answer' : 'incorrect-answer'}">${result.selected_option_text}</span></p>
+                <h4>Question ${index + 1}: ${escapeHtml(result.question_text)}</h4>
+                <p><strong>Your answer:</strong> <span class="${isCorrect ? 'correct-answer' : 'incorrect-answer'}">${escapeHtml(result.selected_option_text)}</span></p>
                 ${!isCorrect ? `
-                    <p><strong>Correct answer:</strong> <span class="correct-answer">${result.correct_option_text}</span></p>
+                    <p><strong>Correct answer:</strong> <span class="correct-answer">${escapeHtml(result.correct_option_text)}</span></p>
                     ${result.explanation ? `
                         <div class="explanation">
-                            <strong>Explanation:</strong> ${result.explanation}
+                            <strong>Explanation:</strong> ${escapeHtml(result.explanation)}
                         </div>
                     ` : ''}
                 ` : '<p class="correct-answer">✓ Correct!</p>'}

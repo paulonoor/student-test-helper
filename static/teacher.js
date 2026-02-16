@@ -4,6 +4,13 @@ let currentTestId = null;
 // API Base URL
 const API_BASE = '/api';
 
+// Helper function to escape HTML and prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Load initial data
 document.addEventListener('DOMContentLoaded', () => {
     loadDisciplines();
@@ -21,19 +28,26 @@ async function loadDisciplines() {
         list.innerHTML = disciplines.map(d => `
             <div class="list-item">
                 <div class="list-item-content">
-                    <h3>${d.name}</h3>
-                    <p>${d.description || 'No description'}</p>
+                    <h3>${escapeHtml(d.name)}</h3>
+                    <p>${escapeHtml(d.description || 'No description')}</p>
                 </div>
                 <div class="list-item-actions">
-                    <button onclick="deleteDiscipline(${d.id})" class="btn btn-danger">Delete</button>
+                    <button class="btn btn-danger delete-discipline-btn" data-discipline-id="${d.id}">Delete</button>
                 </div>
             </div>
         `).join('');
         
+        // Attach event listeners for delete buttons
+        document.querySelectorAll('.delete-discipline-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                deleteDiscipline(parseInt(this.dataset.disciplineId));
+            });
+        });
+        
         // Update discipline dropdown
         const select = document.getElementById('testDiscipline');
         select.innerHTML = '<option value="">Select Discipline</option>' +
-            disciplines.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+            disciplines.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
             
     } catch (error) {
         console.error('Error loading disciplines:', error);
@@ -102,16 +116,29 @@ async function loadTests() {
         list.innerHTML = tests.map(t => `
             <div class="list-item">
                 <div class="list-item-content">
-                    <h3>${t.title}</h3>
-                    <p>${t.description || 'No description'}</p>
-                    <p><strong>Discipline:</strong> ${t.discipline_name} | <strong>Questions:</strong> ${t.question_count}</p>
+                    <h3>${escapeHtml(t.title)}</h3>
+                    <p>${escapeHtml(t.description || 'No description')}</p>
+                    <p><strong>Discipline:</strong> ${escapeHtml(t.discipline_name)} | <strong>Questions:</strong> ${t.question_count}</p>
                 </div>
                 <div class="list-item-actions">
-                    <button onclick="manageQuestions(${t.id}, '${t.title}')" class="btn btn-primary">Manage Questions</button>
-                    <button onclick="deleteTest(${t.id})" class="btn btn-danger">Delete</button>
+                    <button class="btn btn-primary manage-questions-btn" data-test-id="${t.id}" data-test-title="${escapeHtml(t.title)}">Manage Questions</button>
+                    <button class="btn btn-danger delete-test-btn" data-test-id="${t.id}">Delete</button>
                 </div>
             </div>
         `).join('');
+        
+        // Attach event listeners
+        document.querySelectorAll('.manage-questions-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                manageQuestions(parseInt(this.dataset.testId), this.dataset.testTitle);
+            });
+        });
+        
+        document.querySelectorAll('.delete-test-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                deleteTest(parseInt(this.dataset.testId));
+            });
+        });
     } catch (error) {
         console.error('Error loading tests:', error);
         alert('Failed to load tests');
@@ -204,18 +231,25 @@ async function loadQuestions() {
         } else {
             list.innerHTML = test.questions.map((q, index) => `
                 <div class="question-card">
-                    <h3>Question ${index + 1}: ${q.question_text}</h3>
+                    <h3>Question ${index + 1}: ${escapeHtml(q.question_text)}</h3>
                     <div class="question-options">
                         ${q.options.map(o => `
                             <div class="option-label" style="${o.is_correct ? 'background: #d4edda; font-weight: bold;' : ''}">
-                                ${o.is_correct ? '✓' : '•'} ${o.option_text}
+                                ${o.is_correct ? '✓' : '•'} ${escapeHtml(o.option_text)}
                             </div>
                         `).join('')}
                     </div>
-                    ${q.explanation ? `<p><strong>Explanation:</strong> ${q.explanation}</p>` : ''}
-                    <button onclick="deleteQuestion(${q.id})" class="btn btn-danger" style="margin-top: 10px;">Delete Question</button>
+                    ${q.explanation ? `<p><strong>Explanation:</strong> ${escapeHtml(q.explanation)}</p>` : ''}
+                    <button class="btn btn-danger delete-question-btn" data-question-id="${q.id}" style="margin-top: 10px;">Delete Question</button>
                 </div>
             `).join('');
+            
+            // Attach event listeners for delete buttons
+            document.querySelectorAll('.delete-question-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deleteQuestion(parseInt(this.dataset.questionId));
+                });
+            });
         }
     } catch (error) {
         console.error('Error loading questions:', error);
