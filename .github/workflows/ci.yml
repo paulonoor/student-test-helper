@@ -37,8 +37,7 @@ jobs:
       
     - name: Run tests
       run: |
-        pytest tests/ -v --tb=short || echo "No tests found yet"
-      continue-on-error: true
+        PYTHONPATH=. pytest tests/ -v --tb=short
       
   build:
     runs-on: ubuntu-latest

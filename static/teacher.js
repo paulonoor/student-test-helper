@@ -179,15 +179,15 @@ function manageQuestions(testId, testTitle) {
     currentTestId = testId;
     document.getElementById('currentTestTitle').textContent = testTitle;
     document.getElementById('questionsSection').style.display = 'block';
-    document.querySelector('.section:nth-child(1)').style.display = 'none';
-    document.querySelector('.section:nth-child(2)').style.display = 'none';
+    document.getElementById('disciplinesSection').style.display = 'none';
+    document.getElementById('testsSection').style.display = 'none';
     loadQuestions();
 }
 
 function hideQuestionsSection() {
     document.getElementById('questionsSection').style.display = 'none';
-    document.querySelector('.section:nth-child(1)').style.display = 'block';
-    document.querySelector('.section:nth-child(2)').style.display = 'block';
+    document.getElementById('disciplinesSection').style.display = 'block';
+    document.getElementById('testsSection').style.display = 'block';
     currentTestId = null;
 }
 
