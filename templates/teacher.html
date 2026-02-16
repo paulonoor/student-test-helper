@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Interface - Student Test Helper</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👨‍🏫 Teacher Interface</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/student">Student Interface</a>
+            </nav>
+        </header>
+
+        <!-- Disciplines Section -->
+        <section class="section" id="disciplinesSection">
+            <h2>Disciplines</h2>
+            <div class="form-group">
+                <input type="text" id="disciplineName" placeholder="Discipline name" />
+                <input type="text" id="disciplineDescription" placeholder="Description (optional)" />
+                <button onclick="createDiscipline()" class="btn btn-primary">Add Discipline</button>
+            </div>
+            <div id="disciplinesList" class="list"></div>
+        </section>
+
+        <!-- Tests Section -->
+        <section class="section" id="testsSection">
+            <h2>Tests</h2>
+            <div class="form-group">
+                <select id="testDiscipline">
+                    <option value="">Select Discipline</option>
+                </select>
+                <input type="text" id="testTitle" placeholder="Test title" />
+                <input type="text" id="testDescription" placeholder="Description (optional)" />
+                <button onclick="createTest()" class="btn btn-primary">Create Test</button>
+            </div>
+            <div id="testsList" class="list"></div>
+        </section>
+
+        <!-- Questions Section -->
+        <section class="section" id="questionsSection" style="display: none;">
+            <h2>Questions for: <span id="currentTestTitle"></span></h2>
+            <button onclick="hideQuestionsSection()" class="btn btn-secondary">Back to Tests</button>
+            
+            <div class="form-group">
+                <textarea id="questionText" placeholder="Question text" rows="3"></textarea>
+                <textarea id="questionExplanation" placeholder="Explanation for the correct answer" rows="2"></textarea>
+                
+                <div id="optionsContainer">
+                    <h3>Options:</h3>
+                    <div class="option-input">
+                        <input type="text" class="option-text" placeholder="Option 1" />
+                        <label><input type="radio" name="correctOption" value="0" checked /> Correct</label>
+                    </div>
+                    <div class="option-input">
+                        <input type="text" class="option-text" placeholder="Option 2" />
+                        <label><input type="radio" name="correctOption" value="1" /> Correct</label>
+                    </div>
+                    <div class="option-input">
+                        <input type="text" class="option-text" placeholder="Option 3" />
+                        <label><input type="radio" name="correctOption" value="2" /> Correct</label>
+                    </div>
+                    <div class="option-input">
+                        <input type="text" class="option-text" placeholder="Option 4" />
+                        <label><input type="radio" name="correctOption" value="3" /> Correct</label>
+                    </div>
+                </div>
+                
+                <button onclick="addQuestion()" class="btn btn-primary">Add Question</button>
+            </div>
+            
+            <div id="questionsList" class="list"></div>
+        </section>
+    </div>
+
+    <script src="/static/teacher.js"></script>
+</body>
+</html>
